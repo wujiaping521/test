@@ -1,0 +1,185 @@
+<!--
+    THIS EXAMPLE WAS DOWNLOADED FROM https://echarts.apache.org/examples/zh/editor.html?c=bar-race-country
+-->
+<!DOCTYPE html>
+<html style="height: 100%">
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<body style="height: 100%; margin: 0">
+		<div id="container" style="width: 80%; height: 80%"></div>
+		
+		<!-- <button id="stop" style="position: fixed;bottom: 100px;right: 100px;z-index: 99999999;">暂停</button>
+		<button>开始</button> -->
+		<script type="text/javascript" src="./static/jq.js"></script>
+		<script type="text/javascript" src="./static/echarts.js"></script>
+		
+		<script src="./static/data.js"></script>
+		<script type="text/javascript">
+			var dom = document.getElementById("container");
+			// var stop = document.getElementById("stop");
+			var myChart = echarts.init(dom);
+			var app = {};
+			
+			var option;
+		
+			// var ROOT_PATH = 'https://cdn.jsdelivr.net/gh/apache/echarts-website@asf-site/examples'
+
+			const updateFrequency = 2000;
+			const dimension = 0;
+			const countryColors = {
+				'19A': '#d5d5d5',
+				'19B': '#cecece',
+				'20A': '#c5c7c6',
+				'20B': '#bdbfbe',
+				'20C': '#b5b6b8',
+				'20D': '#a4a9ac',
+				'20E (EU1)': '#8b9597',
+				'20F': '#6d7a82',
+				'20G': '#7c4d7b',
+				'20H (Beta, V2)': '#7c4d7b',
+				'20I (Alpha, V1)': '#7773bf',
+				'20J (Gamma, V3)': '#316f98',
+				'21A (Delta)': '#337fa3',
+				'21B (Kappa)': '#348eb0',
+				'21C (Epsilon)': '#72a4c9',
+				'21D (Eta)': '#3f9151',
+				'21E (Theta)': '#5ba254',
+				'21F (Iota)': '#74b056',
+				'21G (Lambda)': '#95b85a',
+				'21H (Mu)': '#b1c355',
+				'21I (Delta)': '#ffc687',
+				'21J (Delta)': '#f2b05c',
+				'21K (Omicron)': '#f89c39',
+				'21L (Omicron)': '#f17e25',
+				'21M (Omicron)': '#f1731e',
+			};
+			const years = [];
+			for (let i = 0; i < data.length; ++i) {
+				if (years.length === 0 || years[years.length - 1] !== data[i][4]) {
+					years.push(data[i][4]);
+				}
+			}
+
+			console.log(years)
+			let startIndex = 0;
+			let startYear = years[startIndex];
+			console.log('startYear', startYear)
+			option = {
+				grid: {
+					top: 10,
+					bottom: 30,
+					left: 150,
+					right: 80
+				},
+				xAxis: {
+					max: 'dataMax',
+					axisLabel: {
+						formatter: function(n) {
+							return Math.round(n) + '';
+						}
+					}
+				},
+				dataset: {
+					source: data.slice(1).filter(function(d) {
+						return d[4] === startYear;
+					})
+				},
+				yAxis: {
+					type: 'category',
+					inverse: true,
+					max: 25,
+					axisLabel: {
+						show: true,
+						fontSize: 14,
+						formatter: function(value) {
+							return value
+							// return value + '{flag|' + getFlag(value) + '}';
+						},
+						rich: {
+							flag: {
+								fontSize: 25,
+								padding: 5
+							}
+						},
+						color:function(param){
+							console.log(param)
+							// return 'red'
+							return countryColors[param]
+						}
+					},
+					animationDuration: 300,
+					animationDurationUpdate: 300
+					
+				},
+				series: [{
+					realtimeSort: true,
+					seriesLayoutBy: 'column',
+					type: 'bar',
+					itemStyle: {
+						color: function(param) {
+							return countryColors[param.value[3]] || '#5470c6';
+						}
+					},
+					encode: {
+						x: dimension,
+						y: 3
+					},
+					label: {
+						show: true,
+						precision: 1,
+						position: 'right',
+						// valueAnimation: true,
+						valueAnimation: false,
+						fontFamily: 'monospace'
+					}
+				}],
+				// Disable init animation.
+				animationDuration: 0,
+				animationDurationUpdate: updateFrequency,
+				animationEasing: 'linear',
+				animationEasingUpdate: 'linear',
+				graphic: {
+					elements: [{
+						type: 'text',
+						right: 160,
+						bottom: 60,
+						style: {
+							text: startYear,
+							font: 'bolder 80px monospace',
+							fill: 'rgba(100, 100, 100, 0.25)'
+						},
+						z: 100
+					}]
+				}
+			};
+			// console.log(option);
+			myChart.setOption(option);
+			for (let i = startIndex; i < years.length - 1; ++i) {
+				(function(i) {
+					setTimeout(function() {
+						updateYear(years[i + 1]);
+					}, (i - startIndex) * updateFrequency);
+				})(i);
+			}
+
+			function updateYear(year) {
+				let source = data.slice(1).filter(function(d) {
+					return d[4] === year;
+				});
+				option.series[0].data = source;
+				option.graphic.elements[0].style.text = year;
+				myChart.setOption(option);
+			}
+
+			if (option && typeof option === 'object') {
+				myChart.setOption(option);
+			}
+			
+			
+			// stop.addEventListener('click',function(){
+			// 	console.log(stop)
+			// })
+		</script>
+	</body>
+</html>
